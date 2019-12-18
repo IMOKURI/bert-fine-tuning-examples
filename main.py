@@ -19,11 +19,13 @@ if torch.cuda.is_available():
     device = torch.device("cuda")
     print('There are %d GPU(s) available.' % torch.cuda.device_count())
     print('We will use the GPU:', torch.cuda.get_device_name(0))
+    print('')
 
 # If not...
 else:
     print('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
+    exit(1)
 
 # -----------------------------------------------------------------------------
 
@@ -36,6 +38,7 @@ df = pd.read_csv(
 )
 
 print('Number of training sentences: {:,}\n'.format(df.shape[0]))
+print('')
 
 # Get the lists of sentences and their labels.
 sentences = df.sentence.values
@@ -45,6 +48,7 @@ labels = df.label.values
 
 # Load the BERT tokenizer.
 print('Loading BERT tokenizer...')
+print('')
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 # Print the original sentence.
@@ -55,6 +59,7 @@ print('Tokenized: ', tokenizer.tokenize(sentences[0]))
 
 # Print the sentence mapped to token ids.
 print('Token IDs: ', tokenizer.convert_tokens_to_ids(tokenizer.tokenize(sentences[0])))
+print('')
 
 # Tokenize all of the sentences and map the tokens to thier word IDs.
 input_ids = []
@@ -83,10 +88,12 @@ for sent in sentences:
 # Print sentence 0, now as a list of IDs.
 print('Original: ', sentences[0])
 print('Token IDs:', input_ids[0])
+print('')
 
 # -----------------------------------------------------------------------------
 
 print('Max sentence length: ', max([len(sen) for sen in input_ids]))
+print('')
 
 # Set the maximum sequence length.
 # I've chosen 64 somewhat arbitrarily. It's slightly larger than the
@@ -102,6 +109,7 @@ input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long",
                           value=0, truncating="post", padding="post")
 
 print('\nDone.')
+print('')
 
 # -----------------------------------------------------------------------------
 
@@ -386,6 +394,7 @@ for epoch_i in range(0, epochs):
 
 print("")
 print("Training complete!")
+print('')
 
 # -----------------------------------------------------------------------------
 
@@ -399,6 +408,7 @@ df = pd.read_csv(
 
 # Report the number of sentences.
 print('Number of test sentences: {:,}\n'.format(df.shape[0]))
+print('')
 
 # Create sentence and label lists
 sentences = df.sentence.values
@@ -484,15 +494,18 @@ for batch in prediction_dataloader:
   true_labels.append(label_ids)
 
 print('    DONE.')
+print('')
 
 # -----------------------------------------------------------------------------
 
 print('Positive samples: %d of %d (%.2f%%)' % (df.label.sum(), len(df.label), (df.label.sum() / len(df.label) * 100.0)))
+print('')
 
 matthews_set = []
 
 # Evaluate each test batch using Matthew's correlation coefficient
 print('Calculating Matthews Corr. Coef. for each batch...')
+print('')
 
 # For each input batch...
 for i in range(len(true_labels)):
@@ -516,5 +529,6 @@ flat_true_labels = [item for sublist in true_labels for item in sublist]
 # Calculate the MCC
 mcc = matthews_corrcoef(flat_true_labels, flat_predictions)
 
+print('')
 print('MCC: %.3f' % mcc)
-
+print('')
